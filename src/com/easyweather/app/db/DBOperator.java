@@ -140,8 +140,8 @@ public class DBOperator {
 		if(county != null){
 			//构建查询参数组合对象
 			ContentValues values = new ContentValues();
-			values.put("county_name", county.getCoutyName());
-			values.put("county_code", county.getCoutyCode());
+			values.put("county_name", county.getCountyName());
+			values.put("county_code", county.getCountyCode());
 			values.put("city_id", county.getCityId());
 			mSQLiteDatabase.insert("county", null, values);
 		}
@@ -169,8 +169,8 @@ public class DBOperator {
 			do{
 				County county = new County();
 				county.setId(cursor.getInt(cursor.getColumnIndex("id")));
-				county.setCoutyName(cursor.getString(cursor.getColumnIndex("county_name")));
-				county.setCoutyCode(cursor.getString(cursor.getColumnIndex("county_code")));
+				county.setCountyName(cursor.getString(cursor.getColumnIndex("county_name")));
+				county.setCountyCode(cursor.getString(cursor.getColumnIndex("county_code")));
 				county.setCityId(cityId);
 				list.add(county);
 			}while(cursor.moveToFirst());

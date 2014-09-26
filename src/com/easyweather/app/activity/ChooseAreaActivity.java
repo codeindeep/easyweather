@@ -5,7 +5,10 @@ import java.util.List;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
@@ -38,6 +41,9 @@ public class ChooseAreaActivity extends Activity{
 	private DBOperator dbOperator;
 	private List<String> dataSourceList = new ArrayList<String>();
 	
+	//是否从WeatherActivity中跳转过来
+	private boolean isFromeWeatherActivity;
+	
 	//省列表
 	private List<Province> provinceList;
 	
@@ -59,6 +65,17 @@ public class ChooseAreaActivity extends Activity{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		//预处理
+		isFromeWeatherActivity = getIntent().getBooleanExtra("from_weather_activity", false);
+		//读取SharedPreference文件中的数据
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		if(prefs.getBoolean("city_selected", false) && !isFromeWeatherActivity){
+			Intent intent = new Intent(this, WeatherActivity.class);
+			startActivity(intent);
+			finish();
+			return;
+		}
+			
 		//去除系统默认的标题头
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.choose_area);
@@ -87,6 +104,12 @@ public class ChooseAreaActivity extends Activity{
 					selectedCity = cityList.get(position);
 					//调用查询县的方法
 					queryCounty();
+				}else if(currentSelectedLevel == LEVEL_COUNTY){
+					String countyCode = countyList.get(position).getCountyCode();
+					Intent intent = new Intent(ChooseAreaActivity.this, WeatherActivity.class);
+					intent.putExtra("county_code", countyCode);
+					startActivity(intent);
+					finish();
 				}
 			}
 		});
@@ -164,7 +187,7 @@ public class ChooseAreaActivity extends Activity{
 			dataSourceList.clear();
 			//遍历查询结果，并将城市的名称添加到数据源中
 			for(County county : countyList){
-				dataSourceList.add(county.getCoutyName());
+				dataSourceList.add(county.getCountyName());
 			}
 			
 			//每当数据源发送变化时，需要通知适配器
